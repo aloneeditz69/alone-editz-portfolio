@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alone Editz | Video Editor & Motion Designer</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --bg-main: #051F20;
+            --bg-sec: #0B2B26;
+            --bg-card: #163832;
+            --accent: #235347;
+            --text-sec: #8EB69B;
+            --text-main: #DAF1DE;
+            --glow-color: rgba(35, 83, 71, 0.4);
+            --glow-hover: rgba(35, 83, 71, 0.8);
+            --transition: all 0.4s ease;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; cursor: default; }
+        html { scroll-behavior: smooth; }
+        body { background-color: var(--bg-main); color: var(--text-main); line-height: 1.6; -webkit-font-smoothing: antialiased; overflow-x: hidden; position: relative; }
+
+        /* 🌟 CINEMATIC OUTLINE GLOW RING (NO FILL, MAXIMUM SMOOTHNESS, AUTO FADE) 🌟 */
+        .custom-cursor {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 30px;
+            height: 30px;
+            border: 2px solid var(--text-sec);
+            background: transparent;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 999999;
+            box-shadow: 0 0 25px 8px var(--accent), inset 0 0 10px rgba(142, 182, 155, 0.3);
+            transform: translate(-50%, -50%);
+            opacity: 0;
+            transition: opacity 0.25s ease, transform 0.2s ease;
+        }
+
+        /* 🌟 VIGNETTE EFFECT 🌟 */
+        .vignette-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 9998; background: radial-gradient(circle at center, transparent 45%, rgba(0, 0, 0, 0.75) 100%); }
+
+        /* 🌟 BACKGROUND FX, SHAPES & SKY 🌟 */
+        .bg-fx-container { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1; overflow: hidden; pointer-events: none; }
+        .starry-sky { position: absolute; top: 0; left: 0; width: 100%; height: 100%; -webkit-mask-image: linear-gradient(to bottom, black 0%, transparent 70%); mask-image: linear-gradient(to bottom, black 0%, transparent 70%); }
+        .static-stars { position: absolute; background: transparent; }
+        .stars-small { width: 1px; height: 1px; opacity: 0.6; box-shadow: 10vw 5vh #FFF, 25vw 15vh #FFF, 40vw 8vh #FFF, 55vw 2vh #FFF, 70vw 20vh #FFF, 85vw 10vh #FFF, 95vw 25vh #FFF, 5vw 35vh #FFF, 20vw 45vh #FFF, 35vw 30vh #FFF, 50vw 50vh #FFF, 65vw 40vh #FFF, 80vw 55vh #FFF, 90vw 35vh #FFF, 15vw 60vh #FFF, 30vw 70vh #FFF, 45vw 65vh #FFF, 60vw 85vh #FFF, 75vw 70vh #FFF, 88vw 80vh #FFF; }
+        .stars-big { width: 2px; height: 2px; opacity: 0.3; box-shadow: 12vw 12vh #FFF, 35vw 5vh #FFF, 65vw 18vh #FFF, 82vw 8vh #FFF, 8vw 55vh #FFF, 48vw 42vh #FFF, 72vw 62vh #FFF, 92vw 48vh #FFF; }
+
+        /* 🌟 FIXED 100% CENTERED BACKGROUND TEXT 🌟 */
+        .bg-text-center { 
+            position: fixed; 
+            top: 50%; 
+            left: 0;
+            width: 100%;
+            text-align: center;
+            transform: translateY(-50%); 
+            font-family: 'Dancing Script', cursive; 
+            font-weight: 700; 
+            font-size: clamp(4rem, 15vw, 12rem); 
+            color: var(--text-main); 
+            white-space: nowrap; 
+            user-select: none; 
+            pointer-events: none; 
+            animation: bg-text-wiggle 12s infinite ease-in-out, bg-text-flicker 5s infinite linear; 
+        }
+        @keyframes bg-text-wiggle { 
+            0% { transform: translateY(-50%) rotate(0deg) scale(1); } 
+            25% { transform: translateY(-52%) rotate(2deg) scale(1.02); } 
+            50% { transform: translateY(-49%) rotate(-1deg) scale(1); } 
+            75% { transform: translateY(-51%) rotate(1deg) scale(1.01); } 
+            100% { transform: translateY(-50%) rotate(0deg) scale(1); } 
+        }
+        @keyframes bg-text-flicker { 0%, 100% { opacity: 0.03; } 20% { opacity: 0.03; } 21% { opacity: 0.06; } 22% { opacity: 0.02; } 23% { opacity: 0.04; } 60% { opacity: 0.03; } 61% { opacity: 0.05; } 62% { opacity: 0.02; } }
+
+        .glow-orb { position: absolute; border-radius: 50%; background: radial-gradient(circle, var(--accent) 0%, transparent 60%); opacity: 0.15; filter: blur(40px); animation: orb-float 20s infinite alternate ease-in-out; }
+        .glow-orb.one { width: 450px; height: 450px; top: -100px; left: -100px; }
+        .glow-orb.two { width: 550px; height: 550px; bottom: -150px; right: -100px; animation-delay: -5s; }
+
+        /* Floating Logos & Shapes */
+        .software-logo { position: absolute; border: 2px solid rgba(142, 182, 155, 0.2); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-weight: 700; color: rgba(142, 182, 155, 0.3); box-shadow: inset 0 0 20px rgba(35, 83, 71, 0.1); }
+        .logo-ae { width: 100px; height: 100px; font-size: 2.8rem; top: 20%; right: 10%; animation: float-logo-1 14s infinite alternate ease-in-out; }
+        .logo-pr { width: 60px; height: 60px; font-size: 1.5rem; bottom: 30%; left: 8%; animation: float-logo-2 19s infinite alternate-reverse ease-in-out; }
+
+        .shape { position: absolute; border: 1px solid var(--accent); opacity: 0.1; animation: float-shapes 25s infinite linear; }
+        .shape-sq-1 { width: 50px; height: 50px; top: 15%; left: 25%; animation-duration: 20s; }
+        .shape-sq-2 { width: 30px; height: 30px; bottom: 20%; right: 25%; animation-duration: 15s; animation-direction: reverse; }
+        .shape-ci-1 { width: 80px; height: 80px; border-radius: 50%; top: 60%; left: 15%; animation-duration: 22s; }
+        
+        .shooting-star { position: absolute; width: 120px; height: 1px; background: linear-gradient(to right, transparent, rgba(218, 241, 222, 0.8)); opacity: 0; animation: falling-star linear infinite; }
+        .shooting-star::after { content: ''; position: absolute; right: 0; top: 50%; transform: translateY(-50%); width: 4px; height: 4px; background: #fff; border-radius: 50%; box-shadow: 0 0 10px 2px #DAF1DE, 0 0 20px 4px var(--accent); }
+        .star-1 { top: 10%; left: -10%; animation-duration: 3s; animation-delay: 1s; }
+        .star-2 { top: 30%; left: -20%; animation-duration: 4.5s; animation-delay: 3s; }
+        .star-3 { top: -10%; left: 10%; animation-duration: 4s; animation-delay: 0s; }
+
+        @keyframes falling-star { 0% { transform: rotate(35deg) translateX(0); opacity: 0; } 5% { opacity: 1; } 15% { opacity: 0; transform: rotate(35deg) translateX(400px); } 100% { opacity: 0; transform: rotate(35deg) translateX(1200px); } }
+        @keyframes orb-float { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(60px, 60px) scale(1.1); } }
+        @keyframes float-logo-1 { 0% { transform: translateY(0) rotate(-10deg) scale(1); opacity: 0.4; } 50% { transform: translateY(-25px) rotate(15deg) scale(1.1); opacity: 0.9; } 100% { transform: translateY(15px) rotate(-5deg) scale(0.95); opacity: 0.5; } }
+        @keyframes float-logo-2 { 0% { transform: translateY(0) rotate(15deg) scale(0.9); opacity: 0.5; } 50% { transform: translateY(-30px) rotate(-20deg) scale(1.15); opacity: 0.9; } 100% { transform: translateY(-10px) rotate(10deg) scale(1); opacity: 0.6; } }
+        @keyframes float-shapes { 0% { transform: translateY(0) rotate(0deg); } 50% { transform: translateY(-100px) rotate(180deg); } 100% { transform: translateY(0) rotate(360deg); } }
+
+        h1, h2, h3, h4 { font-weight: 700; line-height: 1.2; color: var(--text-main); text-shadow: 0 0 15px rgba(218, 241, 222, 0.2); }
+        p { color: var(--text-sec); font-weight: 300; }
+        a { text-decoration: none; color: var(--text-main); transition: var(--transition); cursor: pointer;}
+
+        .fade-in { opacity: 0; transform: translateY(60px) scale(0.85); transition: opacity 0.6s ease-out, transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1); will-change: opacity, transform; }
+        .fade-in.visible { opacity: 1; transform: translateY(0) scale(1); }
+
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 5%; }
+        section { padding: 100px 0; }
+
+        /* Navigation & Profile Icon */
+        nav { position: fixed; top: 0; width: 100%; background-color: rgba(5, 31, 32, 0.85); backdrop-filter: blur(12px); z-index: 100; border-bottom: 1px solid var(--bg-sec); }
+        .nav-content { display: flex; justify-content: space-between; align-items: center; height: 70px; max-width: 1200px; margin: 0 auto; padding: 0 5%; }
+        .logo { font-size: 1.2rem; font-weight: 700; letter-spacing: 1px; text-shadow: 0 0 10px rgba(218, 241, 222, 0.3); }
+        .nav-links { display: flex; gap: 2rem; align-items: center; }
+        .nav-links a { font-size: 0.9rem; color: var(--text-sec); font-weight: 400; }
+        .nav-links a:hover { color: var(--text-main); text-shadow: 0 0 8px rgba(218, 241, 222, 0.4); }
+        
+        /* Profile Image Navbar */
+        .profile-icon { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid var(--accent); cursor: pointer; transition: var(--transition); }
+        .profile-icon:hover { box-shadow: 0 0 15px var(--glow-hover); transform: scale(1.1); }
+
+        /* Modal Styles */
+        .modal { display: none; position: fixed; z-index: 99999; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.8); backdrop-filter: blur(8px); align-items: center; justify-content: center; opacity: 0; transition: opacity 0.3s ease; }
+        .modal.show { display: flex; opacity: 1; }
+        .modal-content { background-color: var(--bg-card); border: 1px solid var(--accent); border-radius: 16px; padding: 2.5rem; text-align: center; position: relative; width: 90%; max-width: 400px; box-shadow: 0 0 30px var(--glow-color); transform: scale(0.8); transition: transform 0.3s ease; }
+        .modal.show .modal-content { transform: scale(1); }
+        .close-btn { position: absolute; top: 15px; right: 20px; font-size: 1.5rem; cursor: pointer; color: var(--text-sec); transition: 0.3s; }
+        .close-btn:hover { color: var(--text-main); }
+        .modal-pic { width: 120px; height: 120px; border-radius: 50%; border: 3px solid var(--accent); margin-bottom: 1rem; object-fit: cover; }
+        .modal-content h2 { margin-bottom: 0.5rem; }
+        .modal-info p { margin: 5px 0; font-size: 0.95rem; color: var(--text-main); }
+        .modal-info strong { color: var(--text-sec); }
+        
+        /* Modal Buttons */
+        .modal-actions { display: flex; flex-direction: column; gap: 10px; margin-top: 1.5rem; }
+        .btn-wa { background-color: #25D366; color: #fff; padding: 10px; border-radius: 6px; font-weight: 600; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 8px; transition: 0.3s; }
+        .btn-wa:hover { background-color: #1EBE5D; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(37, 211, 102, 0.3); }
+        .btn-ig { background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); color: #fff; padding: 10px; border-radius: 6px; font-weight: 600; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 8px; transition: 0.3s; }
+        .btn-ig:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(220, 39, 67, 0.4); }
+
+        .btn { display: inline-block; padding: 12px 28px; border-radius: 6px; font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: var(--transition); border: 1px solid transparent; }
+        .btn-primary { background-color: var(--accent); color: var(--text-main); box-shadow: 0 0 15px var(--glow-color); }
+        .btn-primary:hover { background-color: var(--bg-card); border-color: var(--accent); box-shadow: 0 0 25px var(--glow-hover); transform: translateY(-3px) scale(1.02); }
+        .btn-outline { background-color: transparent; border-color: var(--text-sec); color: var(--text-main); }
+        .btn-outline:hover { border-color: var(--text-main); background-color: var(--bg-sec); box-shadow: 0 0 15px rgba(218, 241, 222, 0.1); transform: translateY(-3px) scale(1.02); }
+
+        .card, .project-card, .store-card { background-color: rgba(11, 43, 38, 0.7); backdrop-filter: blur(5px); border: 1px solid var(--accent); border-radius: 12px; padding: 2rem; transition: var(--transition); box-shadow: 0 0 15px var(--glow-color); position: relative; overflow: hidden; }
+        .card:hover, .project-card:hover, .store-card:hover { border-color: var(--text-main); transform: translateY(-8px) scale(1.02); box-shadow: 0 0 35px var(--glow-hover); }
+
+        .section-header { margin-bottom: 3rem; }
+        .section-header h2 { font-size: 2.2rem; margin-bottom: 0.5rem; }
+        .category-title { font-size: 1.5rem; color: var(--text-main); margin: 3rem 0 1.5rem 0; border-bottom: 1px solid var(--accent); padding-bottom: 0.5rem; }
+        
+        .reels-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 2rem; }
+        .portfolio-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; }
+        .project-card { padding: 0; }
+
+        /* Video Previews & Thumbnail Overlay */
+        .reel-preview { width: 100%; aspect-ratio: 9/16; background-color: #000; position: relative; border-bottom: 1px solid var(--accent); }
+        .project-preview { width: 100%; aspect-ratio: 16/9; background-color: #000; position: relative; border-bottom: 1px solid var(--accent); }
+        
+        .thumbnail-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(11, 43, 38, 0.9); background-size: cover; background-position: center; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 10; transition: opacity 0.3s; }
+        .thumbnail-overlay i { font-size: 3rem; color: var(--text-main); text-shadow: 0 0 20px var(--glow-hover); transition: 0.3s; opacity: 0.8; }
+        .thumbnail-overlay:hover i { transform: scale(1.2); opacity: 1; }
+
+        .project-info { padding: 1.5rem; }
+        .project-category { font-size: 0.75rem; color: var(--text-sec); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.5rem; display: block; font-weight: 600; }
+        .project-info h3 { font-size: 1.2rem; margin-bottom: 0.5rem; }
+
+        /* Digital Store */
+        .store-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; }
+        .store-card { display: flex; flex-direction: column; height: 100%; padding: 0; }
+        .store-thumb { width: 100%; aspect-ratio: 16/9; background-color: #00221f; position: relative; background-size: cover; background-position: center; border-bottom: 1px solid var(--accent); display: flex; align-items: flex-end; padding: 10px; }
+        .store-badge { background-color: rgba(5, 31, 32, 0.9); color: var(--text-main); border: 1px solid var(--accent); padding: 3px 10px; font-size: 0.75rem; border-radius: 4px; font-weight: 600; box-shadow: 0 0 10px var(--glow-color); }
+        .store-content { padding: 1.2rem; display: flex; flex-direction: column; flex-grow: 1; }
+        .store-content h3 { font-size: 1.15rem; margin-bottom: 0.4rem; color: var(--text-main); }
+        .store-content p { font-size: 0.85rem; margin-bottom: 1rem; flex-grow: 1; color: var(--text-sec); }
+        .store-footer { display: flex; align-items: center; justify-content: space-between; margin-top: auto; padding-top: 0.8rem; border-top: 1px solid rgba(35, 83, 71, 0.3); }
+        .store-price { font-size: 1.3rem; font-weight: 700; color: var(--text-main); text-shadow: 0 0 10px rgba(218, 241, 222, 0.3); }
+        .btn-store { padding: 8px 14px; font-size: 0.85rem; background: transparent; border: 1px solid var(--text-sec); color: var(--text-main); border-radius: 6px; cursor: pointer; font-weight: 600; transition: var(--transition); display: flex; align-items: center; gap: 6px; }
+        .btn-store:hover { background: var(--accent); border-color: var(--accent); box-shadow: 0 0 15px var(--glow-hover); transform: translateY(-2px); }
+
+        /* Store Modal */
+        .store-modal-img { width: 100%; aspect-ratio: 16/9; border-radius: 8px; object-fit: cover; margin-bottom: 1.2rem; border: 1px solid var(--accent); box-shadow: 0 0 15px var(--glow-color); }
+        .store-modal-desc { text-align: left; font-size: 0.9rem; color: var(--text-sec); margin-bottom: 1.2rem; line-height: 1.6; }
+        .store-modal-features { text-align: left; margin-bottom: 1.2rem; background: rgba(5, 31, 32, 0.5); padding: 12px; border-radius: 8px; border: 1px solid var(--accent); }
+        .store-modal-features li { font-size: 0.85rem; color: var(--text-main); margin-bottom: 6px; list-style-type: none; display: flex; align-items: center; gap: 8px; }
+        .store-modal-features li i { color: var(--text-sec); }
+        .store-modal-checkout { display: flex; align-items: center; justify-content: space-between; background: rgba(11, 43, 38, 0.9); padding: 12px 16px; border-radius: 8px; border: 1px solid var(--accent); margin-top: 1rem; }
+        .checkout-price { font-size: 1.2rem; font-weight: 700; color: var(--text-main); }
+
+
+        .pricing-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 2rem; }
+        .price-amount { font-size: 2.2rem; color: var(--text-main); font-weight: 700; margin-bottom: 0.5rem; text-shadow: 0 0 15px rgba(218, 241, 222, 0.3); }
+        .price-details { font-size: 0.9rem; margin-bottom: 1.5rem; display: block; color: var(--text-sec); font-weight: 600; }
+        .price-note { font-size: 0.85rem; color: var(--text-sec); font-style: italic; margin-top: 0.5rem; }
+
+        #contact { padding-bottom: 100px; }
+        .contact-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 4rem; align-items: start; }
+        
+        /* Updated Social Links with Icons */
+        .social-links { display: flex; flex-direction: column; gap: 1.2rem; margin-top: 2rem; }
+        .social-links a { font-size: 1.1rem; display: flex; align-items: center; gap: 10px; font-weight: 600; }
+        .social-links a i { font-size: 1.5rem; color: var(--accent); transition: 0.3s; }
+        .social-links a:hover { color: var(--text-main); transform: translateX(5px); }
+        .social-links a:hover i { color: var(--text-main); text-shadow: 0 0 10px rgba(218, 241, 222, 0.4); }
+
+        .contact-form { display: flex; flex-direction: column; gap: 1.2rem; background-color: rgba(11, 43, 38, 0.8); padding: 2rem; border-radius: 12px; border: 1px solid var(--accent); box-shadow: 0 0 20px var(--glow-color); backdrop-filter: blur(5px); }
+        .contact-form input, .contact-form textarea { width: 100%; padding: 15px; background-color: rgba(5, 31, 32, 0.9); border: 1px solid var(--bg-card); border-radius: 8px; color: var(--text-main); font-size: 1rem; transition: var(--transition); }
+        .contact-form input:focus, .contact-form textarea:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 15px var(--glow-hover); }
+        .contact-form textarea { resize: vertical; min-height: 120px; }
+
+        footer { text-align: center; padding: 30px; color: var(--text-sec); border-top: 1px solid var(--bg-sec); background-color: var(--bg-main); font-size: 0.9rem; }
+
+        @media (max-width: 768px) {
+            .nav-links a.link-text { display: none; }
+            .hero-content h1 { font-size: 2.8rem; }
+            .hero-buttons { flex-direction: column; }
+            .btn { text-align: center; }
+            .contact-container { grid-template-columns: 1fr; gap: 2rem; }
+            .software-logo, .shape { display: none; } 
+            .about-container { flex-direction: column; text-align: center; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 🌟 SMOOTH OUTLINE CURSOR (⭕ ONLY RING, FULL SCREEN REACTIVE) 🌟 -->
+    <div class="custom-cursor" id="customCursor"></div>
+
+    <!-- VIGNETTE OVERLAY -->
+    <div class="vignette-overlay"></div>
+
+    <!-- BACKGROUND FX -->
+    <div class="bg-fx-container">
+        <div class="starry-sky"><div class="static-stars stars-small"></div><div class="static-stars stars-big"></div></div>
+        <div class="bg-text-center">Alone Editz</div>
+        <div class="glow-orb one"></div><div class="glow-orb two"></div>
+        <div class="shape shape-sq-1"></div><div class="shape shape-sq-2"></div><div class="shape shape-ci-1"></div>
+        <div class="shooting-star star-1"></div><div class="shooting-star star-2"></div><div class="shooting-star star-3"></div>
+        <div class="software-logo logo-ae">Ae</div><div class="software-logo logo-pr">Pr</div>
+    </div>
+
+    <!-- NAVIGATION -->
+    <nav>
+        <div class="nav-content">
+            <a href="#hero" class="logo">Alone Editz</a>
+            <div class="nav-links">
+                <a href="#about" class="link-text">About</a>
+                <a href="#work" class="link-text">Work</a>
+                <a href="#store" class="link-text">Store</a>
+                <a href="#services" class="link-text">Services</a>
+                <a href="#contact" class="link-text">Contact</a>
+                <img src="https://drive.google.com/thumbnail?id=1gOIP6uG9LwDDIx7tiESPtbcRX_wBPXcV&sz=w500" alt="Profile" class="profile-icon" onclick="openProfileModal()">
+            </div>
+        </div>
+    </nav>
+
+    <!-- 🌟 PROFILE MODAL 🌟 -->
+    <div id="profileModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeProfileModal()">&times;</span>
+            <img src="https://drive.google.com/thumbnail?id=1gOIP6uG9LwDDIx7tiESPtbcRX_wBPXcV&sz=w500" alt="Alone Editz" class="modal-pic">
+            <h2>Alone Editz</h2>
+            <div class="modal-info">
+                <p><strong>Age:</strong> 19 Years</p>
+                <p><strong>Experience:</strong> 3 Years</p>
+                <p><strong>Software:</strong> Adobe Premiere Pro & After Effects</p>
+            </div>
+            <div class="modal-actions">
+                <a href="https://wa.me/918815181361" target="_blank" class="btn-wa">
+                    <i class="fab fa-whatsapp" style="font-size: 1.2rem;"></i> Message on WhatsApp
+                </a>
+                <a href="https://www.instagram.com/alonex.aex?utm_source=ig_web_button_share_sheet&stkn=ZDNlZDc0MzIxNw==" target="_blank" class="btn-ig">
+                    <i class="fab fa-instagram" style="font-size: 1.2rem;"></i> View Instagram
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- STORE MODAL -->
+    <div id="storeModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeStoreModal()">&times;</span>
+            <h2 id="modalTitle" style="color: var(--text-main); margin-bottom: 0.8rem;">Product Title</h2>
+            <img id="modalImg" src="" alt="Product Preview" class="store-modal-img">
+            <p id="modalDesc" class="store-modal-desc">Detailed product description goes here...</p>
+            
+            <div class="store-modal-features">
+                <li><i class="fas fa-check-circle"></i> Compatible with Adobe After Effects</li>
+                <li><i class="fas fa-check-circle"></i> Drag & Drop Custom Presets Included</li>
+                <li><i class="fas fa-check-circle"></i> Instant Digital Download via WhatsApp</li>
+            </div>
+
+            <div class="store-modal-checkout">
+                <div>
+                    <span style="font-size: 0.8rem; color: var(--text-sec); display: block;">Total Price</span>
+                    <span id="modalPrice" class="checkout-price">$0 (₹0)</span>
+                </div>
+                <a id="modalBuyBtn" href="#" target="_blank" class="btn-wa" style="padding: 10px 20px; font-size: 0.9rem;">
+                    <i class="fab fa-whatsapp"></i> Buy via WhatsApp
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <main class="container">
+        <!-- HERO -->
+        <section id="hero" class="fade-in">
+            <div class="hero-content">
+                <span class="hero-label">Video Editor & Motion Designer</span>
+                <h1>Alone Editz</h1>
+                <p>Editing videos that feel clean, engaging and purposeful.</p>
+                <div class="hero-buttons">
+                    <a href="#work" class="btn btn-primary">View My Work</a>
+                    <a href="#contact" class="btn btn-outline">Let's Work Together</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- ABOUT ME SECTION -->
+        <section id="about" class="fade-in">
+            <div class="section-header">
+                <h2>About Me</h2>
+            </div>
+            <div class="about-container card fade-in" style="display: flex; align-items: center; gap: 3rem; flex-wrap: wrap;">
+                <div class="about-logo" style="flex: 1; min-width: 250px; text-align: center; position: relative; padding: 20px 0; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                    <!-- Round Profile Logo Image Fixed & Perfectly Sized -->
+                    <img src="https://drive.google.com/thumbnail?id=1gOIP6uG9LwDDIx7tiESPtbcRX_wBPXcV&sz=w500" alt="Alone Editz Logo" style="width: 140px; height: 140px; border-radius: 50%; object-fit: cover; border: 3px solid var(--accent); box-shadow: 0 0 25px var(--glow-hover); margin-bottom: 1rem; animation: float-logo-1 4s infinite alternate ease-in-out;">
+                    
+                    <!-- Fixed 'Alone Editz' single line clean text -->
+                    <div style="font-family: 'Dancing Script', cursive; font-size: 2.4rem; color: var(--text-main); white-space: nowrap; text-shadow: 0 0 20px var(--glow-color);">
+                        Alone Editz
+                    </div>
+                </div>
+                <div class="about-text" style="flex: 2; min-width: 300px;">
+                    <h3 style="font-size: 1.8rem; margin-bottom: 1rem; color: var(--text-main);">Hi, I'm Vansh</h3>
+                    <p style="font-size: 1.05rem; margin-bottom: 1rem; color: var(--text-main);">
+                        I am a professional video editor and motion designer with over 3 years of hands-on experience. I specialize in transforming raw footage into highly engaging, polished, and purposeful content that hooks the audience from the first second.
+                    </p>
+                    <p style="font-size: 1.05rem; margin-bottom: 1.5rem; color: var(--text-sec);">
+                        Whether it's creating dynamic motion graphics in After Effects or structuring seamless storytelling in Premiere Pro, my editing process is built on delivering professional-level aesthetics. Let's collaborate—I'm confident you'll absolutely love the final result!
+                    </p>
+                    <a href="#contact" class="btn btn-primary">Let's Work Together</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- DIGITAL STORE -->
+        <section id="store" class="fade-in">
+            <div class="section-header">
+                <h2>Digital Store</h2>
+                <p>Professional Text Packs, Effect Presets, and Motion Templates.</p>
+            </div>
+
+            <div class="store-grid">
+                <div class="store-card fade-in">
+                    <div class="store-thumb" style="background-image: url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=600&q=80');">
+                        <span class="store-badge">Text Pack</span>
+                    </div>
+                    <div class="store-content">
+                        <h3>Cyberpunk Kinetic Text Presets</h3>
+                        <p>High-energy kinetic typography presets designed for After Effects.</p>
+                        <div class="store-footer">
+                            <span class="store-price">$4 <span style="font-size: 0.9rem; color: var(--text-sec);">(₹330)</span></span>
+                            <button class="btn-store" onclick="openStoreModal('Cyberpunk Kinetic Text Presets', 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=600&q=80', 'A collection of over 25+ modern kinetic typography preset animations built for Adobe After Effects.', '$4 (₹330)')">
+                                <i class="fas fa-eye"></i> Quick View
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="store-card fade-in">
+                    <div class="store-thumb" style="background-image: url('https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=600&q=80');">
+                        <span class="store-badge">Effect Pack</span>
+                    </div>
+                    <div class="store-content">
+                        <h3>Glitch & Distortion VFX Suite</h3>
+                        <p>Cinematic VHS glitches, RGB splits, and analog distortion elements.</p>
+                        <div class="store-footer">
+                            <span class="store-price">$8 <span style="font-size: 0.9rem; color: var(--text-sec);">(₹660)</span></span>
+                            <button class="btn-store" onclick="openStoreModal('Glitch & Distortion VFX Suite', 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=600&q=80', 'Advanced modular glitch toolkit featuring RGB aberration, digital tear effects, and scanlines.', '$8 (₹660)')">
+                                <i class="fas fa-eye"></i> Quick View
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="store-card fade-in">
+                    <div class="store-thumb" style="background-image: url('https://images.unsplash.com/photo-1579546929518-9e396f3cc809?auto=format&fit=crop&w=600&q=80');">
+                        <span class="store-badge">Transition Pack</span>
+                    </div>
+                    <div class="store-content">
+                        <h3>Seamless Zoom & Pan Transitions</h3>
+                        <p>Smooth camera movement presets to make your long-form videos pop.</p>
+                        <div class="store-footer">
+                            <span class="store-price">$3 <span style="font-size: 0.9rem; color: var(--text-sec);">(₹250)</span></span>
+                            <button class="btn-store" onclick="openStoreModal('Seamless Zoom & Pan Transitions', 'https://images.unsplash.com/photo-1579546929518-9e396f3cc809?auto=format&fit=crop&w=600&q=80', '50+ drag-and-drop smooth zoom and whip-pan transitions designed for After Effects.', '$3 (₹250)')">
+                                <i class="fas fa-eye"></i> Quick View
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- WORK -->
+        <section id="work" class="fade-in">
+            <div class="section-header">
+                <h2>Selected Work</h2>
+                <p>Recent video editing and motion graphics projects.</p>
+            </div>
+            
+            <!-- REELS -->
+            <h3 class="category-title fade-in">Reels & Shorts</h3>
+            <div class="reels-grid">
+                
+                <div class="project-card fade-in">
+                    <div class="reel-preview">
+                        <div class="thumbnail-overlay" style="background-image: url('https://images.unsplash.com/photo-1534447677768-be436bb09401?auto=format&fit=crop&w=500&q=80');" onclick="loadVideo(this, 'https://drive.google.com/file/d/1sYlu0S9wQZVnic1Xe6B8v7mC0bI6Z6eE/preview')">
+                            <i class="fas fa-play-circle"></i>
+                        </div>
+                        <iframe data-src="" width="100%" height="100%" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe>
+                    </div>
+                    <div class="project-info">
+                        <span class="project-category">Short-Form</span>
+                        <h3>Motion Graphics Edit</h3>
+                    </div>
+                </div>
+
+                <div class="project-card fade-in">
+                    <div class="reel-preview">
+                        <div class="thumbnail-overlay" style="background-image: url('https://images.unsplash.com/photo-1563089145-599997674d42?auto=format&fit=crop&w=500&q=80');" onclick="loadVideo(this, 'https://drive.google.com/file/d/1Ah3_2sHglmNwAGebG0PBQyX0ZgI_g_KS/preview')">
+                            <i class="fas fa-play-circle"></i>
+                        </div>
+                        <iframe data-src="" width="100%" height="100%" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe>
+                    </div>
+                    <div class="project-info">
+                        <span class="project-category">Short-Form</span>
+                        <h3>Normal Shorts Editing</h3>
+                    </div>
+                </div>
+            </div>
+
+            <!-- LONG FORM -->
+            <h3 class="category-title fade-in" style="margin-top: 4rem;">Long-Form Videos</h3>
+            <div class="portfolio-grid">
+                
+                <div class="project-card fade-in">
+                    <div class="project-preview">
+                        <div class="thumbnail-overlay" style="background-image: url('https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?auto=format&fit=crop&w=800&q=80');" onclick="loadVideo(this, 'https://drive.google.com/file/d/1EAHqxtN_w6UnfGt_SwWU8WDBx0U3QvLo/preview')">
+                            <i class="fas fa-play-circle"></i>
+                        </div>
+                        <iframe data-src="" width="100%" height="100%" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe>
+                    </div>
+                    <div class="project-info">
+                        <span class="project-category">YouTube Video</span>
+                        <h3>Normal Video Editing</h3>
+                    </div>
+                </div>
+
+                <div class="project-card fade-in">
+                    <div class="project-preview">
+                        <div class="thumbnail-overlay" style="background-image: url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=800&q=80');" onclick="loadVideo(this, 'https://drive.google.com/file/d/1xcmpDlccRhUFpPyvRgeAM6GutfnMTvAH/preview')">
+                            <i class="fas fa-play-circle"></i>
+                        </div>
+                        <iframe data-src="" width="100%" height="100%" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe>
+                    </div>
+                    <div class="project-info">
+                        <span class="project-category">YouTube Video</span>
+                        <h3>Motion Graphics & VFX</h3>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SERVICES -->
+        <section id="services">
+            <div class="section-header fade-in"><h2>Services & Software</h2></div>
+            <div class="portfolio-grid">
+                <div class="card fade-in"><h3>Video Editing</h3><p>Shorts, reels, long-form videos. Highly proficient in Adobe Premiere Pro.</p></div>
+                <div class="card fade-in"><h3>Motion Graphics</h3><p>Typography, animated visuals. Developing advanced skills in Adobe After Effects.</p></div>
+            </div>
+        </section>
+
+        <!-- PRICING -->
+        <section id="pricing">
+            <div class="section-header fade-in"><h2>Pricing Setup</h2></div>
+            <div class="pricing-grid">
+                <div class="card fade-in">
+                    <h3>Short-form</h3>
+                    <div class="price-amount">$8–$10</div>
+                    <span class="price-details">(₹660–₹830) <br> 30–60 seconds</span>
+                    <p class="price-note">* Note: Price depends on video length and complexity.</p>
+                </div>
+                <div class="card fade-in">
+                    <h3>Long-form</h3>
+                    <div class="price-amount">$15–$35</div>
+                    <span class="price-details">(₹1,250–₹2,900) <br> 2–5 minutes</span>
+                    <p class="price-note">* Note: Price depends on video length and complexity.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- CONTACT -->
+        <section id="contact" class="fade-in">
+            <div class="contact-container">
+                <div class="contact-info">
+                    <h2>Let's work together.</h2>
+                    <p>Have a project in mind? Drop a message or reach out.</p>
+                    
+                    <div class="social-links">
+                        <a href="https://www.instagram.com/alonex.aex?utm_source=ig_web_button_share_sheet&stkn=ZDNlZDc0MzIxNw==" target="_blank">
+                            <i class="fab fa-instagram"></i> @alonex.aex
+                        </a>
+                        <a href="mailto:aloneeditz8815@gmail.com">
+                            <i class="fas fa-envelope"></i> aloneeditz8815@gmail.com
+                        </a>
+                    </div>
+                </div>
+
+                <form class="contact-form" action="https://formsubmit.co/aloneeditz8815@gmail.com" method="POST">
+                    <input type="hidden" name="_captcha" value="false">
+                    <input type="text" name="name" placeholder="Your Name" required>
+                    <input type="email" name="email" placeholder="Your Email" required>
+                    <textarea name="message" placeholder="Tell me about your project..." required></textarea>
+                    <button type="submit" class="btn btn-primary">Send Message</button>
+                </form>
+            </div>
+        </section>
+
+    </main>
+
+    <footer><p>© 2026 Alone Editz. All rights reserved.</p></footer>
+
+    <script>
+        const cursor = document.getElementById('customCursor');
+        let mouseX = window.innerWidth / 2;
+        let mouseY = window.innerHeight / 2;
+        let cursorX = mouseX;
+        let cursorY = mouseY;
+        let isMoving = false;
+        let idleTimer;
+
+        window.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+            isMoving = true;
+            cursor.style.opacity = '1';
+
+            clearTimeout(idleTimer);
+            idleTimer = setTimeout(() => {
+                isMoving = false;
+                cursor.style.opacity = '0';
+            }, 90);
+        });
+
+        window.addEventListener('touchmove', (e) => {
+            if(e.touches.length > 0) {
+                mouseX = e.touches[0].clientX;
+                mouseY = e.touches[0].clientY;
+                isMoving = true;
+                cursor.style.opacity = '1';
+
+                clearTimeout(idleTimer);
+                idleTimer = setTimeout(() => {
+                    isMoving = false;
+                    cursor.style.opacity = '0';
+                }, 100);
+            }
+        });
+
+        window.addEventListener('touchend', () => {
+            cursor.style.opacity = '0';
+        });
+
+        function renderCursor() {
+            cursorX += (mouseX - cursorX) * 0.14;
+            cursorY += (mouseY - cursorY) * 0.14;
+
+            cursor.style.left = `${cursorX}px`;
+            cursor.style.top = `${cursorY}px`;
+
+            requestAnimationFrame(renderCursor);
+        }
+        renderCursor();
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) entry.target.classList.add('visible');
+                    else entry.target.classList.remove('visible');
+                });
+            }, { threshold: 0.1 });
+
+            document.querySelectorAll('.fade-in').forEach(element => observer.observe(element));
+        });
+
+        function openProfileModal() {
+            document.getElementById('profileModal').classList.add('show');
+        }
+        function closeProfileModal() {
+            document.getElementById('profileModal').classList.remove('show');
+        }
+
+        function openStoreModal(title, imgUrl, desc, price) {
+            document.getElementById('modalTitle').innerText = title;
+            document.getElementById('modalImg').src = imgUrl;
+            document.getElementById('modalDesc').innerText = desc;
+            document.getElementById('modalPrice').innerText = price;
+            
+            let waMsg = encodeURIComponent(`Hi Alone, I want to buy the "${title}" (${price}) from your Digital Store.`);
+            document.getElementById('modalBuyBtn').href = `https://wa.me/918815181361?text=${waMsg}`;
+            
+            document.getElementById('storeModal').classList.add('show');
+        }
+
+        function closeStoreModal() {
+            document.getElementById('storeModal').classList.remove('show');
+        }
+
+        window.onclick = function(event) {
+            let profileModal = document.getElementById('profileModal');
+            let storeModal = document.getElementById('storeModal');
+            if (event.target == profileModal) closeProfileModal();
+            if (event.target == storeModal) closeStoreModal();
+        }
+
+        function loadVideo(overlayElement, videoUrl) {
+            overlayElement.style.display = 'none';
+            let iframe = overlayElement.nextElementSibling;
+            iframe.src = videoUrl + "?autoplay=1&vq=hd1080";
+        }
+    </script>
+</body>
+</html>
